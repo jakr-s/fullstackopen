@@ -1,10 +1,10 @@
 const Persons = ({ searchFor, persons }) => {
   const filteredPersons =
-    searchFor !== ""
+    searchFor !== ''
       ? persons.filter((person) =>
           person.name.toLowerCase().includes(searchFor.toLowerCase())
         )
-      : persons;
+      : persons
 
   return (
     <ul>
@@ -14,7 +14,7 @@ const Persons = ({ searchFor, persons }) => {
         </li>
       ))}
     </ul>
-  );
-};
+  )
+}
 
-export default Persons;
+export default Persons
