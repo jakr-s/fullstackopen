@@ -1,4 +1,4 @@
-const Persons = ({ searchFor, persons }) => {
+const Persons = ({ searchFor, persons, removePerson }) => {
   const filteredPersons =
     searchFor !== ''
       ? persons.filter((person) =>
@@ -7,13 +7,14 @@ const Persons = ({ searchFor, persons }) => {
       : persons
 
   return (
-    <ul>
+    <div>
       {filteredPersons.map((person) => (
-        <li key={person.id}>
-          {person.name} {person.number}
-        </li>
+        <p key={person.id}>
+          {person.name} {person.number}{' '}
+          <button onClick={() => removePerson(person.id)}>remove</button>
+        </p>
       ))}
-    </ul>
+    </div>
   )
 }
 

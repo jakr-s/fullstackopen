@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
+import db from './services/db'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -11,9 +11,11 @@ const App = () => {
   const [searchFor, setSearchFor] = useState('')
 
   useEffect(() => {
-    axios.get('http://localhost:3001/persons').then((response) => {
-      setPersons(response.data)
-    })
+    db.getAll()
+      .then((personsData) => {
+        setPersons(personsData)
+      })
+      .catch((error) => console.log(error))
   }, [])
 
   const handleNameChange = (event) => setNewName(event.target.value)
@@ -24,19 +26,54 @@ const App = () => {
     event.preventDefault()
     const personObject = {
       name: newName,
-      number: newNumber,
-      id: persons.length + 1
+      number: newNumber
     }
 
-    const hasDuplicate = persons.some((person) => person.name === newName)
+    const duplicatePerson = persons.find((person) => person.name === newName)
 
-    if (hasDuplicate) {
-      return alert(`${newName} is already added to phonebook`)
+    if (duplicatePerson) {
+      const confirmMessage = `${duplicatePerson.name} is already added to the phonebook, replace the old number with a new one?`
+
+      if (window.confirm(confirmMessage)) {
+        const updatedPerson = {
+          ...duplicatePerson,
+          number: newNumber
+        }
+
+        db.update(duplicatePerson.id, updatedPerson)
+          .then((returnedPerson) => {
+            setPersons(
+              persons.map((person) =>
+                person.id !== duplicatePerson.id ? person : returnedPerson
+              )
+            )
+          })
+          .catch((error) => console.log(error))
+      }
+
+      return
     }
 
-    setPersons(persons.concat(personObject))
+    db.create(personObject)
+      .then((newPerson) => setPersons(persons.concat(newPerson)))
+      .catch((error) => console.log(error))
+
     setNewName('')
     setNewNumber('')
+  }
+
+  const removePerson = (id) => {
+    const person = persons.find((person) => person.id === id)
+
+    if (window.confirm(`Delete ${person.name}?`)) {
+      db.remove(id)
+        .then((response) => {
+          setPersons(persons.filter((person) => person.id !== response.id))
+        })
+        .catch((error) => console.log(error))
+    } else {
+      return
+    }
   }
 
   return (
@@ -54,7 +91,11 @@ const App = () => {
       />
 
       <h2>Numbers</h2>
-      <Persons searchFor={searchFor} persons={persons} />
+      <Persons
+        searchFor={searchFor}
+        persons={persons}
+        removePerson={removePerson}
+      />
     </div>
   )
 }
