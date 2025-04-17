@@ -1,20 +1,21 @@
-const Persons = ({ searchFor, persons }) => {
+const Persons = ({ searchFor, persons, removePerson }) => {
   const filteredPersons =
-    searchFor !== ""
+    searchFor !== ''
       ? persons.filter((person) =>
           person.name.toLowerCase().includes(searchFor.toLowerCase())
         )
-      : persons;
+      : persons
 
   return (
-    <ul>
+    <div>
       {filteredPersons.map((person) => (
-        <li key={person.id}>
-          {person.name} {person.number}
-        </li>
+        <p key={person.id}>
+          {person.name} {person.number}{' '}
+          <button onClick={() => removePerson(person.id)}>remove</button>
+        </p>
       ))}
-    </ul>
-  );
-};
+    </div>
+  )
+}
 
-export default Persons;
+export default Persons

@@ -3,7 +3,7 @@ const PersonForm = ({
   newName,
   newNumber,
   handleNameChange,
-  handleNumberChange,
+  handleNumberChange
 }) => {
   return (
     <form onSubmit={onSubmit}>
@@ -17,7 +17,7 @@ const PersonForm = ({
         <button type="submit">add</button>
       </div>
     </form>
-  );
-};
+  )
+}
 
-export default PersonForm;
+export default PersonForm

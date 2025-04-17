@@ -1,42 +1,80 @@
-import { useState } from "react";
-import Filter from "./components/Filter";
-import PersonForm from "./components/PersonForm";
-import Persons from "./components/Persons";
+import { useState, useEffect } from 'react'
+import Filter from './components/Filter'
+import PersonForm from './components/PersonForm'
+import Persons from './components/Persons'
+import db from './services/db'
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: "Arto Hellas", number: "040-123456", id: 1 },
-    { name: "Ada Lovelace", number: "39-44-5323523", id: 2 },
-    { name: "Dan Abramov", number: "12-43-234345", id: 3 },
-    { name: "Mary Poppendieck", number: "39-23-6423122", id: 4 },
-  ]);
+  const [persons, setPersons] = useState([])
+  const [newName, setNewName] = useState('')
+  const [newNumber, setNewNumber] = useState('')
+  const [searchFor, setSearchFor] = useState('')
 
-  const [newName, setNewName] = useState("");
-  const [newNumber, setNewNumber] = useState("");
-  const [searchFor, setSearchFor] = useState("");
+  useEffect(() => {
+    db.getAll()
+      .then((personsData) => {
+        setPersons(personsData)
+      })
+      .catch((error) => console.log(error))
+  }, [])
 
-  const handleNameChange = (event) => setNewName(event.target.value);
-  const handleNumberChange = (event) => setNewNumber(event.target.value);
-  const handleSearchFor = (event) => setSearchFor(event.target.value);
+  const handleNameChange = (event) => setNewName(event.target.value)
+  const handleNumberChange = (event) => setNewNumber(event.target.value)
+  const handleSearchFor = (event) => setSearchFor(event.target.value)
 
   const addPerson = (event) => {
-    event.preventDefault();
+    event.preventDefault()
     const personObject = {
       name: newName,
-      number: newNumber,
-      id: persons.length + 1,
-    };
-
-    const hasDuplicate = persons.some((person) => person.name === newName);
-
-    if (hasDuplicate) {
-      return alert(`${newName} is already added to phonebook`);
+      number: newNumber
     }
 
-    setPersons(persons.concat(personObject));
-    setNewName("");
-    setNewNumber("");
-  };
+    const duplicatePerson = persons.find((person) => person.name === newName)
+
+    if (duplicatePerson) {
+      const confirmMessage = `${duplicatePerson.name} is already added to the phonebook, replace the old number with a new one?`
+
+      if (window.confirm(confirmMessage)) {
+        const updatedPerson = {
+          ...duplicatePerson,
+          number: newNumber
+        }
+
+        db.update(duplicatePerson.id, updatedPerson)
+          .then((returnedPerson) => {
+            setPersons(
+              persons.map((person) =>
+                person.id !== duplicatePerson.id ? person : returnedPerson
+              )
+            )
+          })
+          .catch((error) => console.log(error))
+      }
+
+      return
+    }
+
+    db.create(personObject)
+      .then((newPerson) => setPersons(persons.concat(newPerson)))
+      .catch((error) => console.log(error))
+
+    setNewName('')
+    setNewNumber('')
+  }
+
+  const removePerson = (id) => {
+    const person = persons.find((person) => person.id === id)
+
+    if (window.confirm(`Delete ${person.name}?`)) {
+      db.remove(id)
+        .then((response) => {
+          setPersons(persons.filter((person) => person.id !== response.id))
+        })
+        .catch((error) => console.log(error))
+    } else {
+      return
+    }
+  }
 
   return (
     <div>
@@ -53,9 +91,13 @@ const App = () => {
       />
 
       <h2>Numbers</h2>
-      <Persons searchFor={searchFor} persons={persons} />
+      <Persons
+        searchFor={searchFor}
+        persons={persons}
+        removePerson={removePerson}
+      />
     </div>
-  );
-};
+  )
+}
 
-export default App;
+export default App
