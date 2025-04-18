@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
+import Notification from './components/Notification'
 import db from './services/db'
 
 const App = () => {
@@ -9,6 +10,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [searchFor, setSearchFor] = useState('')
+  const [displayMessage, setDisplayMessage] = useState(null)
 
   useEffect(() => {
     db.getAll()
@@ -21,6 +23,13 @@ const App = () => {
   const handleNameChange = (event) => setNewName(event.target.value)
   const handleNumberChange = (event) => setNewNumber(event.target.value)
   const handleSearchFor = (event) => setSearchFor(event.target.value)
+
+  const showMessage = (text, isError = false) => {
+    setDisplayMessage({ text, isError })
+    setTimeout(() => {
+      setDisplayMessage(null)
+    }, 5000)
+  }
 
   const addPerson = (event) => {
     event.preventDefault()
@@ -47,6 +56,7 @@ const App = () => {
                 person.id !== duplicatePerson.id ? person : returnedPerson
               )
             )
+            showMessage(`${newName}'s number was changed to ${newNumber}`)
           })
           .catch((error) => console.log(error))
       }
@@ -55,7 +65,10 @@ const App = () => {
     }
 
     db.create(personObject)
-      .then((newPerson) => setPersons(persons.concat(newPerson)))
+      .then((newPerson) => {
+        setPersons(persons.concat(newPerson))
+        showMessage(`Added ${newPerson.name}`)
+      })
       .catch((error) => console.log(error))
 
     setNewName('')
@@ -69,8 +82,16 @@ const App = () => {
       db.remove(id)
         .then((response) => {
           setPersons(persons.filter((person) => person.id !== response.id))
+          showMessage(`${person.name} was removed from the phonebook`)
         })
-        .catch((error) => console.log(error))
+        .catch((error) => {
+          console.log(error)
+          setPersons(persons.filter((person) => person.id !== id))
+          showMessage(
+            `${person.name} was already deleted from the server`,
+            true
+          )
+        })
     } else {
       return
     }
@@ -79,6 +100,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={displayMessage} />
       <Filter searchFor={searchFor} handleSearchFor={handleSearchFor} />
 
       <h2>add a new</h2>
