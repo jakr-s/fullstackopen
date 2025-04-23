@@ -19,6 +19,10 @@ fullstackopen/
 └── ...
 ```
 
+## Deployments
+
+[Full Stack Phonebook](https://fso-phonebook-u62z.onrender.com)
+
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/) (version 18 or later recommended)
