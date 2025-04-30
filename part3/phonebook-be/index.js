@@ -21,9 +21,9 @@ app.get('/api/info', (request, response, next) => {
   Person.find({})
     .then((persons) => {
       response.send(`
-      <p>Phonebook has info for ${persons.length} people</p>
-      <p>${Date()}</p>
-    `)
+        <p>Phonebook has info for ${persons.length} people</p>
+        <p>${Date()}</p>
+      `)
     })
     .catch((error) => next(error))
 })
