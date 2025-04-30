@@ -52,8 +52,10 @@ const App = () => {
         db.update(duplicatePerson.id, updatedPerson)
           .then((returnedPerson) => {
             setPersons(
-              persons.map((person) =>
-                person.id !== duplicatePerson.id ? person : returnedPerson
+              persons.map((prevPerson) =>
+                prevPerson.id !== duplicatePerson.id
+                  ? prevPerson
+                  : returnedPerson
               )
             )
             showMessage(`${newName}'s number was changed to ${newNumber}`)
