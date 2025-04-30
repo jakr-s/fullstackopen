@@ -80,13 +80,15 @@ const App = () => {
 
     if (window.confirm(`Delete ${person.name}?`)) {
       db.remove(id)
-        .then((response) => {
-          setPersons(persons.filter((person) => person.id !== response.id))
+        .then(() => {
+          setPersons(
+            persons.filter((prevPerson) => prevPerson.id !== person.id)
+          )
           showMessage(`${person.name} was removed from the phonebook`)
         })
         .catch((error) => {
           console.log(error)
-          setPersons(persons.filter((person) => person.id !== id))
+          setPersons(persons.filter((prevPerson) => prevPerson.id !== id))
           showMessage(
             `${person.name} was already deleted from the server`,
             true
