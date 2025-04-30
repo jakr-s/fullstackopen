@@ -52,13 +52,15 @@ const App = () => {
         db.update(duplicatePerson.id, updatedPerson)
           .then((returnedPerson) => {
             setPersons(
-              persons.map((person) =>
-                person.id !== duplicatePerson.id ? person : returnedPerson
+              persons.map((prevPerson) =>
+                prevPerson.id !== duplicatePerson.id
+                  ? prevPerson
+                  : returnedPerson
               )
             )
             showMessage(`${newName}'s number was changed to ${newNumber}`)
           })
-          .catch((error) => console.log(error))
+          .catch((error) => showMessage(error.response.data.error, true))
       }
 
       return
@@ -69,7 +71,7 @@ const App = () => {
         setPersons(persons.concat(newPerson))
         showMessage(`Added ${newPerson.name}`)
       })
-      .catch((error) => console.log(error))
+      .catch((error) => showMessage(error.response.data.error, true))
 
     setNewName('')
     setNewNumber('')
