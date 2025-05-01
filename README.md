@@ -33,7 +33,7 @@ fullstackopen/
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/fullstackopen.git
+git clone https://github.com/jakr-s/fullstackopen.git
 cd fullstackopen
 ```
 
@@ -55,19 +55,6 @@ pnpm dev
 ```
 
 This will start the Vite development server, typically available at http://localhost:5173.
-
-## Backend Services
-
-For part2/phonebook and other applications that require a backend:
-
-1. Start the JSON server (if needed):
-
-```bash
-cd part2/phonebook
-pnpm server
-```
-
-This will start a mock REST API at http://localhost:3001.
 
 ## Additional Resources
 
